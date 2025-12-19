@@ -44,6 +44,47 @@ export interface StockDataResult {
     lastRefreshed: string;
     dailyData: NormalizedDailyData[];
     fromCache: boolean;
+    overview?: AlphaVantageOverview;
+}
+
+export interface AlphaVantageOverview {
+    Symbol: string;
+    Name: string;
+    Description: string;
+    Exchange: string;
+    Currency: string;
+    Country: string;
+    Sector: string;
+    Industry: string;
+    MarketCapitalization: string;
+    PERatio: string;
+    PEGRatio: string;
+    BookValue: string;
+    DividendPerShare: string;
+    DividendYield: string;
+    EPS: string;
+    RevenuePerShareTTM: string;
+    ProfitMargin: string;
+    OperatingMarginTTM: string;
+    ReturnOnAssetsTTM: string;
+    ReturnOnEquityTTM: string;
+    RevenueTTM: string;
+    GrossProfitTTM: string;
+    DilutedEPSTTM: string;
+    QuarterlyEarningsGrowthYOY: string;
+    QuarterlyRevenueGrowthYOY: string;
+    AnalystTargetPrice: string;
+    TrailingPE: string;
+    ForwardPE: string;
+    PriceToSalesRatioTTM: string;
+    PriceToBookRatio: string;
+    EVToRevenue: string;
+    EVToEBITDA: string;
+    Beta: string;
+    '52WeekHigh': string;
+    '52WeekLow': string;
+    '50DayMovingAverage': string;
+    '200DayMovingAverage': string;
 }
 
 export interface SearchResult {
@@ -126,6 +167,84 @@ class AlphaVantageService {
             throw error;
         }
     }
+
+    /**
+     * Fetch stock overview data (PE ratio, sector, etc.)
+     */
+    async getStockOverview(symbol: string): Promise<AlphaVantageOverview | null> {
+        const dataType = 'OVERVIEW';
+
+        // Try to get from cache first
+        const cachedData = await supabaseService.getCachedStockData(symbol, dataType);
+
+        if (cachedData) {
+            console.log(`Using cached overview for ${symbol}`);
+            return cachedData;
+        }
+
+        // Fetch from API
+        console.log(`Fetching fresh overview for ${symbol} from Alpha Vantage`);
+        try {
+            const data = await this.queueRequest(() => this.fetchStockOverview(symbol));
+
+            if (data) {
+                // Cache the response
+                await supabaseService.cacheStockData(symbol, dataType, data);
+            }
+
+            return data;
+        } catch (error) {
+            console.error(`Error fetching overview for ${symbol}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Fetch overview from Alpha Vantage API
+     */
+    private async fetchStockOverview(symbol: string): Promise<AlphaVantageOverview | null> {
+        const params = new URLSearchParams({
+            function: 'OVERVIEW',
+            symbol: symbol.toUpperCase(),
+            apikey: this.apiKey,
+        });
+
+        const url = `${this.baseUrl}?${params.toString()}`;
+
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Check for API errors
+            if (data['Error Message']) {
+                throw new Error(`Alpha Vantage API error: ${data['Error Message']}`);
+            }
+
+            if (data['Note']) {
+                throw new Error(
+                    'API rate limit exceeded. Please wait a moment and try again.'
+                );
+            }
+
+            if (!data['Symbol']) {
+                console.warn(`No overview data available for ${symbol} from Alpha Vantage`);
+                return null;
+            }
+
+            return data;
+        } catch (error) {
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error('Failed to fetch stock overview from Alpha Vantage');
+        }
+    }
+
 
     /**
      * Fetch daily time series data for a stock symbol

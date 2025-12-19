@@ -31,10 +31,18 @@ export function StockCard({ stock, onRemove }: StockCardProps) {
             setLoading(true);
             setError('');
 
-            const data = await alphaVantageService.getDailyTimeSeries(stock.symbol);
+            const [data, overview] = await Promise.all([
+                alphaVantageService.getDailyTimeSeries(stock.symbol),
+                alphaVantageService.getStockOverview(stock.symbol).catch(err => {
+                    console.error('Failed to fetch overview:', err);
+                    return null;
+                })
+            ]);
+
             const calculatedInsights = stockInsightsService.calculateInsights(
                 stock.symbol,
-                data.dailyData
+                data.dailyData,
+                overview || undefined
             );
 
             setInsights(calculatedInsights);
@@ -153,6 +161,14 @@ export function StockCard({ stock, onRemove }: StockCardProps) {
                     <div className="insight-label">Volume</div>
                     <div className="insight-value">
                         {stockInsightsService.formatLargeNumber(insights.volume)}
+                    </div>
+                </div>
+
+                {/* PE Ratio */}
+                <div className="insight-item">
+                    <div className="insight-label">P/E Ratio</div>
+                    <div className="insight-value">
+                        {insights.peRatio ? insights.peRatio.toFixed(2) : 'N/A'}
                     </div>
                 </div>
 

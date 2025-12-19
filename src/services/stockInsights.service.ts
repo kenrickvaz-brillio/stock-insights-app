@@ -4,7 +4,7 @@
  * All calculations are done client-side for performance
  */
 
-import type { NormalizedDailyData } from './alphaVantage.service';
+import type { NormalizedDailyData, AlphaVantageOverview } from './alphaVantage.service';
 
 export interface StockInsights {
     symbol: string;
@@ -25,6 +25,7 @@ export interface StockInsights {
     volume: number;
     high52Week?: number;
     low52Week?: number;
+    peRatio?: number;
 }
 
 /**
@@ -34,7 +35,11 @@ class StockInsightsService {
     /**
      * Calculate comprehensive insights from daily stock data
      */
-    calculateInsights(symbol: string, dailyData: NormalizedDailyData[]): StockInsights {
+    calculateInsights(
+        symbol: string,
+        dailyData: NormalizedDailyData[],
+        overview?: AlphaVantageOverview
+    ): StockInsights {
         if (!dailyData || dailyData.length === 0) {
             throw new Error('No data available to calculate insights');
         }
@@ -54,6 +59,11 @@ class StockInsightsService {
         // Calculate 52-week high/low if we have enough data
         const { high52Week, low52Week } = this.calculate52WeekHighLow(dailyData);
 
+        // Parse PE Ratio
+        const peRatio = overview?.PERatio && overview.PERatio !== 'None'
+            ? parseFloat(overview.PERatio)
+            : undefined;
+
         return {
             symbol,
             latestPrice: latest.close,
@@ -64,6 +74,7 @@ class StockInsightsService {
             volume: latest.volume,
             high52Week,
             low52Week,
+            peRatio,
         };
     }
 

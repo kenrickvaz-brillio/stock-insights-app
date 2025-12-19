@@ -85,6 +85,21 @@ CREATE POLICY "Authenticated users can read cache"
   TO authenticated
   USING (true);
 
+-- All authenticated users can insert into cache
+CREATE POLICY "Authenticated users can insert into cache"
+  ON stock_data_cache
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+-- All authenticated users can update cache
+CREATE POLICY "Authenticated users can update cache"
+  ON stock_data_cache
+  FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
 -- =====================================================
 -- FUTURE EXTENSIBILITY NOTES
 -- =====================================================
