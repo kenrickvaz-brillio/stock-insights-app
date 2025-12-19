@@ -1,0 +1,217 @@
+/* StockCard Component Styles */
+
+.stock-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    animation: cardAppear 0.4s ease-out;
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stock-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.stock-card.loading,
+.stock-card.error {
+    min-height: 200px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: 700;
+}
+
+.cache-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: #666;
+    margin-left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.remove-button {
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.remove-button:hover {
+    background: #fee;
+    color: #c33;
+}
+
+.price-section {
+    margin-bottom: 1.5rem;
+}
+
+.current-price {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.price-change {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.price-change.positive {
+    color: #22c55e;
+}
+
+.price-change.negative {
+    color: #ef4444;
+}
+
+.last-updated {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.insight-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.insight-item:hover {
+    background: #e9ecef;
+}
+
+.insight-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.insight-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.insight-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #333;
+}
+
+/* Loading State */
+.card-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.spinner-small {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 0.75rem;
+}
+
+.card-loading p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Error State */
+.card-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.card-error p {
+    color: #c33;
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+}
+
+.retry-button {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+    background: #764ba2;
+    transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .stock-card {
+        padding: 1.25rem;
+    }
+
+    .current-price {
+        font-size: 1.875rem;
+    }
+
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+}
